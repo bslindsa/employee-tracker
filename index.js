@@ -122,12 +122,15 @@ const init = () => {
                     break;
                 case 'Add a department':
                     // Prompt to enter the name of a department and add to the database
+                    addDepartment();
                     break;
                 case 'Add a role':
                     // Prompt to enter the name, salary, and department for the role and add to the database.
+                    addRole();
                     break;
                 case 'Add an employee':
                     // Prompt to enter the employees first name, last name, role, and manager and add to the database.
+                    addEmployee();
                     break;
                 case 'Update an employee role':
                     // Prompt to select an employee to update and their new role and update in the database.

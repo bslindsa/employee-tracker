@@ -11,3 +11,4 @@ SELECT employees.id, first_name, last_name, title, departments.department, salar
 JOIN roles ON employees.role_id = roles.id
 JOIN departments ON roles.department_id = departments.id
 ORDER BY id ASC;
+
