@@ -6,23 +6,23 @@ VALUES  ('Engineering'),
         ('Sales');
 
 -- Add to Roles
-INSERT INTO roles (title, department, salary)
-VALUES   ('Sales Lead', 'Sales', 100000),
-        ('Salesperson', 'Sales', 80000),
-        ('Lead Engineer', 'Engineering', 150000),
-        ('Software Engineer', 'Engineering', 120000),
-        ('Account Manager', 'Finance', 160000),
-        ('Accountant', 'Finance', 125000),
-        ('Legal Team Lead', 'Legal', 250000),
-        ('Lawyer', 'Legal', 190000);
+INSERT INTO roles (title, department_id, salary)
+VALUES   ('Sales Lead', 4, 100000),
+        ('Salesperson', 4, 80000),
+        ('Lead Engineer', 1, 150000),
+        ('Software Engineer', 1, 120000),
+        ('Account Manager', 2, 160000),
+        ('Accountant', 2, 125000),
+        ('Legal Team Lead', 3, 250000),
+        ('Lawyer', 3, 190000);
 
 -- Add to Employees
-INSERT INTO employees (first_name, last_name, role, manager)
-VALUES  ('John', 'Doe', 'Sales Lead', null),
-        ('Mike', 'Chan', 'Salesperson', 'John Doe'),
-        ('Ashley', 'Rodriguez', 'Lead Engineer', null),
-        ('Kevin', 'Tupik', 'Software Engineer', 'Ashley Rodgriquez'),
-        ('Kunal', 'Singh', 'Account Manager', null),
-        ('Malia', 'Brown', 'Accountant', 'Kunal Singh'),
-        ('Sarah', 'Lourd', 'Legal Team Lead', null),
-        ('Tom', 'Allen', 'Lawyer', 'Sarah Lourd');
+INSERT INTO employees (first_name, last_name, role_id, manager)
+VALUES  ('John', 'Doe', 1, null),
+        ('Mike', 'Chan', 2, 'John Doe'),
+        ('Ashley', 'Rodriguez', 3, null),
+        ('Kevin', 'Tupik', 4, 'Ashley Rodgriquez'),
+        ('Kunal', 'Singh', 5, null),
+        ('Malia', 'Brown', 6, 'Kunal Singh'),
+        ('Sarah', 'Lourd', 7, null),
+        ('Tom', 'Allen', 8, 'Sarah Lourd');
