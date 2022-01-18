@@ -14,7 +14,11 @@ const db = mysql.createConnection(
     console.log(`Connected to the employees_db database.`)
   );
 
-
+const viewDepartments = () => {
+    db.query(`SELECT * FROM employees_db.departments`, (err, data) => {
+        console.table(data);
+    })
+}
 
 const addDepartment = () => {
     inquirer
@@ -28,7 +32,9 @@ const addDepartment = () => {
         .then((data) => {
             // Add department to department table.
             db.query(`INSERT INTO departments (department) 
-                VALUE (${data.department});`);
+                VALUE (${data.department});`, (err, result) => {
+                    console.log(result);
+                });
         });
 };
 
@@ -49,7 +55,7 @@ const addRole = () => {
                 type: 'list',
                 message: 'Which department does the role belong to?',
                 name: 'department',
-                choices: [...departments], 
+                choices: [], 
             }
         ])
         .then((data) => {
@@ -64,7 +70,7 @@ const addRole = () => {
 
 const addEmployee = () => {
     inquirer
-        prompt([
+        .prompt([
             {
                 type: 'input',
                 message: "What is the employee's first name?",
@@ -79,26 +85,28 @@ const addEmployee = () => {
                 type: 'list',
                 message: "What is the employee's role?",
                 name: 'role',
-                choices: [...roles],
+                choices: [],
             },
             {
                 type: 'list',
                 message: "Who is the employee's manager?",
                 name: 'manager',
-                choices: [...employees]
+                choices: []
             }
         ])
         .then((data) => {
             // Add employee data to employee table
             db.query(`INSERT INTO employees (first_name, last_name, role_id, manager) 
-            VALUE   (${data.firstName}),
-                    (${data.lastName}),
-                    (${data.role}),
-                    (${data.manager});`);
+                VALUE   (${data.firstName}),
+                        (${data.lastName}),
+                        (${data.role}),
+                        (${data.manager});`, (err, data) => {
+                console.table(data);    
+                });
         })
 };
 
-
+// Use console.table() to make formatted tables
 const init = () => {
     inquirer
         .prompt([
@@ -106,13 +114,14 @@ const init = () => {
                 type: 'list',
                 message: 'What would you like to do?',
                 name: 'action',
-                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role']
+                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Quit']
             }
         ])
         .then((data) => {
             switch (data.action) {
                 case 'View all departments':
                     // Present formatted table showing department names and department ids
+                    viewDepartments();
                     break;
                 case 'View all roles':
                     // Present table with job titles, role ids, departments that the roles belong to, and salary for that role.
@@ -136,7 +145,10 @@ const init = () => {
                     // Prompt to select an employee to update and their new role and update in the database.
                     break;
                 default:
-                    console.log('Please choose a viable option');
+                    return;
             }
         });
 };
+
+
+init();
