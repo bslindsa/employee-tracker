@@ -17,7 +17,7 @@ const db = mysql.createConnection(
 const viewDepartments = () => {
     db.query(`SELECT * FROM employees_db.departments`, (err, result) => {
         console.table(result);
-    })
+    });
 };
 
 const viewRoles = () => {
@@ -25,8 +25,17 @@ const viewRoles = () => {
     JOIN departments ON roles.department_id = departments.id
     ORDER BY id ASC;`, (err, result) => {
         console.table(result);
-    })
-}
+    });
+};
+
+const viewEmployees = () => {
+    db.query(`SELECT employees.id, first_name, last_name, title, departments.department, salary, manager FROM employees
+    JOIN roles ON employees.role_id = roles.id
+    JOIN departments ON roles.department_id = departments.id
+    ORDER BY id ASC;`, (err, result) => {
+        console.table(result);
+    });
+};
 
 const addDepartment = () => {
     inquirer
@@ -137,6 +146,7 @@ const init = () => {
                     break;
                 case 'View all employees':
                     // Present table with employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to.
+                    viewEmployees();
                     break;
                 case 'Add a department':
                     // Prompt to enter the name of a department and add to the database
@@ -158,6 +168,5 @@ const init = () => {
             }
         });
 };
-
 
 init();
