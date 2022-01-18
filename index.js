@@ -15,8 +15,16 @@ const db = mysql.createConnection(
   );
 
 const viewDepartments = () => {
-    db.query(`SELECT * FROM employees_db.departments`, (err, data) => {
-        console.table(data);
+    db.query(`SELECT * FROM employees_db.departments`, (err, result) => {
+        console.table(result);
+    })
+};
+
+const viewRoles = () => {
+    db.query(`SELECT roles.id, title, departments.department, salary FROM roles
+    JOIN departments ON roles.department_id = departments.id
+    ORDER BY id ASC;`, (err, result) => {
+        console.table(result);
     })
 }
 
@@ -125,6 +133,7 @@ const init = () => {
                     break;
                 case 'View all roles':
                     // Present table with job titles, role ids, departments that the roles belong to, and salary for that role.
+                    viewRoles();
                     break;
                 case 'View all employees':
                     // Present table with employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to.
