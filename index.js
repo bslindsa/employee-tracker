@@ -121,6 +121,7 @@ const addEmployee = () => {
                 name: `${item.first_name} ${item.last_name}`,
                 value: item.id
             }));
+            empList.push({name: 'None', value: null});
             inquirer
                 .prompt([
                     {
