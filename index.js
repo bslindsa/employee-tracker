@@ -61,8 +61,8 @@ const addDepartment = () => {
             //`INSERT INTO departments SET ? `, {department: data.department}
             db.query(`INSERT INTO departments (department) 
             VALUES  ('${data.department}');`, (err, result) => {
-                console.log("err", err);
-                console.log(result);
+                if (err) console.log(err);
+                console.log('Department has been added');
                 //ask question again
                 init();
             });
@@ -102,7 +102,7 @@ const addRole = () => {
                         ${data.department_id});`, (err, res) => {
 
                     if (err) console.log(err);
-                    console.table(res);
+                    console.log('Role has been added');
                     //ask question again 
                     init();
                 });
@@ -154,7 +154,7 @@ const addEmployee = () => {
                         '${data.role}',
                         ${data.manager});`, (err, data) => {
                         if (err) console.log(err);
-                        console.log(data);
+                        console.log('Employee has been added');
                         init();
                     });
                 }) //end of inquirer.prompt 
@@ -191,7 +191,7 @@ const updateEmployeeRole = () => {
                 .then((data) => {
                     db.query(`UPDATE employees SET role_id = ${data.role} WHERE id = ${data.employee}`, (err, result) => {
                         if (err) console.log(err);
-                        console.log(result);
+                        console.log('Employee role has been updated');
                         init();
                     });
                 }) // End of inquirer.prompt
@@ -199,9 +199,34 @@ const updateEmployeeRole = () => {
     }); // End of employee query
 };
 
+const deleteDepartment = () => {
+    db.query('SELECT id, department FROM departments', (req, res) => {
+        const departList = res.map((item, i) => ({
+            name: `${item.department}`,
+            value: item.id
+        }));
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: "Which department would you like to remove?",
+                    name: 'department',
+                    choices: departList
+                }
+            ])
+            .then((data) => {
+                db.query(`DELETE FROM roles WHERE id = ${data.role}`, (err, result) => {
+                    if (err) console.log(err);
+                    console.log(`Department was removed`);
+                    init();
+                })
+            })
+    });
+};
+
 const deleteRole = () => {
     db.query('SELECT id, title FROM roles', (req, res) => {
-        const empList = res.map((item, i) => ({
+        const roleList = res.map((item, i) => ({
             name: `${item.title}`,
             value: item.id
         }));
@@ -215,7 +240,7 @@ const deleteRole = () => {
                 }
             ])
             .then((data) => {
-                db.query(`DELETE FROM employees WHERE id = ${data.role}`, (err, result) => {
+                db.query(`DELETE FROM roles WHERE id = ${data.role}`, (err, result) => {
                     if (err) console.log(err);
                     console.log(`Role was removed`);
                     init();
@@ -258,7 +283,7 @@ const init = () => {
                     type: 'list',
                     message: 'What would you like to do?',
                     name: 'action',
-                    choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Remove a role', 'Remove an employee', 'Quit']
+                    choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Remove a department', 'Remove a role', 'Remove an employee', 'Quit']
                 }
             ])
             .then((data) => {
@@ -290,6 +315,10 @@ const init = () => {
                     case 'Update an employee role':
                         // Prompt to select an employee to update and their new role and update in the database.
                         updateEmployeeRole();
+                        break;
+                    case 'Remove a department':
+                        // Prompt to select a department to delete
+                        deleteDepartment();
                         break;
                     case 'Remove a role':
                         // Prompt to select a role to delete
