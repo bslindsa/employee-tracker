@@ -23,7 +23,6 @@ const viewDepartments = () => {
         //ask question again 
         init();
     });
-
 };
 
 // Function to view all roles
@@ -35,7 +34,6 @@ const viewRoles = () => {
         //ask question again 
         init();
     });
-
 };
 
 // Function to view all employees
@@ -208,6 +206,43 @@ const updateEmployeeRole = () => {
     }); // End of employee query
 };
 
+// Function to update an employee's manager
+const updateEmployeeManager = () => {
+    db.query('SELECT id, first_name, last_name FROM employees', (req, empRes) => {
+        const empList = empRes.map((item, i) => ({
+            name: `${item.first_name} ${item.last_name}`,
+            value: item.id
+        }));
+        const managerList = empRes.map((item, i) => ({
+            name: `${item.first_name} ${item.last_name}`,
+            value: item.id
+        }));
+        managerList.push({name: `None`, value: null});
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: "Which employee's manager would you like to update?",
+                    name: 'employee',
+                    choices: empList
+                },
+                {
+                    type: 'list',
+                    message: "Which role do you want to assign the selected employee?",
+                    name: 'manager',
+                    choices: managerList
+                }
+            ])
+            .then((data) => {
+                db.query(`UPDATE employees SET manager_id = ${data.manager} WHERE id = ${data.employee}`, (err, result) => {
+                    if (err) console.log(err);
+                    console.log('Employee manager has been updated');
+                    init();
+                });
+            }) // End of inquirer.prompt
+    }); // End of employee query
+};
+
 // Function to delete a department
 const deleteDepartment = () => {
     db.query('SELECT id, department FROM departments', (req, res) => {
@@ -294,7 +329,7 @@ const init = () => {
                 type: 'list',
                 message: 'What would you like to do?',
                 name: 'action',
-                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Remove a department', 'Remove a role', 'Remove an employee', 'Quit']
+                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update an employee manager', 'Remove a department', 'Remove a role', 'Remove an employee', 'Quit']
             }
         ])
         .then((data) => {
@@ -324,9 +359,13 @@ const init = () => {
                     addEmployee();
                     break;
                 case 'Update an employee role':
-                    // Prompt to select an employee to update and their new role and update in the database.
+                    // Prompt to select an employee to update their new role and update in the database.
                     updateEmployeeRole();
                     break;
+                case 'Update an employee manager':
+                    //Prompt to select an employee to update their new manager
+                    updateEmployeeManager();
+                    break; 
                 case 'Remove a department':
                     // Prompt to select a department to delete
                     deleteDepartment();
