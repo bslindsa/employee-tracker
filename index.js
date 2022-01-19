@@ -215,7 +215,7 @@ const deleteDepartment = () => {
                 }
             ])
             .then((data) => {
-                db.query(`DELETE FROM roles WHERE id = ${data.role}`, (err, result) => {
+                db.query(`DELETE FROM departments WHERE id = ${data.department}`, (err, result) => {
                     if (err) console.log(err);
                     console.log(`Department was removed`);
                     init();
