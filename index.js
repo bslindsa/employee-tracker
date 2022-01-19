@@ -19,6 +19,7 @@ const db = mysql.createConnection(
 // Function to view all departments
 const viewDepartments = () => {
     db.query(`SELECT * FROM employees_db.departments`, (err, result) => {
+        if (err) console.log(err);
         console.table(result);
         //ask question again 
         init();
@@ -30,6 +31,7 @@ const viewRoles = () => {
     db.query(`SELECT roles.id, title, departments.department, salary FROM roles
     JOIN departments ON roles.department_id = departments.id
     ORDER BY id ASC;`, (err, result) => {
+        if (err) console.log(err);
         console.table(result);
         //ask question again 
         init();
@@ -43,9 +45,73 @@ const viewEmployees = () => {
     JOIN roles ON employees.role_id = roles.id
     JOIN departments ON roles.department_id = departments.id   
     ORDER BY id ASC;`, (err, result) => {
+        if (err) console.log(err);
         console.table(result);
         //ask question again 
         init();
+    });
+};
+
+const viewEmployeesByManager = () => {
+    db.query('SELECT id, first_name, last_name FROM employees', (req, empRes) => {
+        const empList = empRes.map((item, i) => ({
+            name: `${item.first_name} ${item.last_name}`,
+            value: item.id
+        }));
+        empList.push({ name: 'None', value: null });
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: "What manager's employees would you like to view?",
+                    name: 'manager',
+                    choices: empList,
+                }
+            ])
+            .then((data) => {
+                db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager' FROM employees
+                    LEFT JOIN employees emp ON emp.id = employees.manager_id
+                    JOIN roles ON employees.role_id = roles.id
+                    JOIN departments ON roles.department_id = departments.id 
+                    WHERE employees.manager_id = '${data.manager}'  
+                    ORDER BY id ASC;`, (err, result) => {
+                        if (err) console.log(err);
+                        console.table(result);
+                        //ask question again 
+                        init();
+                });
+            })
+    });
+};
+
+const viewEmployeesByDepartment = () => {
+    db.query('SELECT * FROM departments', (req, res) => {
+        const departList = res.map((item, i) => ({
+            name: item.department,
+            value: item.id
+        }));
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'What department would you like to view?',
+                    name: 'department',
+                    choices: departList,
+                }
+            ])
+            .then((data) => {
+                db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager ' FROM employees
+                    LEFT JOIN employees emp ON emp.id = employees.manager_id
+                    JOIN roles ON employees.role_id = roles.id
+                    JOIN departments ON roles.department_id = departments.id 
+                    WHERE roles.department_id = '${data.department}'  
+                    ORDER BY id ASC;`, (err, result) => {
+                        if (err) console.log(err);
+                        console.table(result);
+                        //ask question again 
+                        init();
+                });
+            })
     });
 };
 
@@ -217,7 +283,7 @@ const updateEmployeeManager = () => {
             name: `${item.first_name} ${item.last_name}`,
             value: item.id
         }));
-        managerList.push({name: `None`, value: null});
+        managerList.push({ name: `None`, value: null });
         inquirer
             .prompt([
                 {
@@ -329,7 +395,7 @@ const init = () => {
                 type: 'list',
                 message: 'What would you like to do?',
                 name: 'action',
-                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update an employee manager', 'Remove a department', 'Remove a role', 'Remove an employee', 'Quit']
+                choices: ['View all departments', 'View all roles', 'View all employees', 'View employees by manager', 'View employees by department', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update an employee manager', 'Remove a department', 'Remove a role', 'Remove an employee', 'Quit']
             }
         ])
         .then((data) => {
@@ -345,6 +411,14 @@ const init = () => {
                 case 'View all employees':
                     // Present table with employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to.
                     viewEmployees();
+                    break;
+                case 'View employees by manager':
+                    // Present table with employee information for a single manager
+                    viewEmployeesByManager();
+                    break;
+                case 'View employees by department':
+                    // Present table with employee information for a single department
+                    viewEmployeesByDepartment();
                     break;
                 case 'Add a department':
                     // Prompt to enter the name of a department and add to the database
@@ -365,7 +439,7 @@ const init = () => {
                 case 'Update an employee manager':
                     //Prompt to select an employee to update their new manager
                     updateEmployeeManager();
-                    break; 
+                    break;
                 case 'Remove a department':
                     // Prompt to select a department to delete
                     deleteDepartment();
