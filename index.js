@@ -153,6 +153,7 @@ const addEmployee = () => {
                         '${data.lastName}',
                         '${data.role}',
                         ${data.manager});`, (err, data) => {
+                        if (err) console.log(err);
                         console.log(data);
                         init();
                     });
@@ -161,7 +162,7 @@ const addEmployee = () => {
     }); //end of employee query 
 };
 
-const updateEmployee = () => {
+const updateEmployeeRole = () => {
     db.query('SELECT id, first_name, last_name FROM employees', (req, empRes) => {
         const empList = empRes.map((item, i) => ({
             name: `${item.first_name} ${item.last_name}`,
@@ -189,60 +190,121 @@ const updateEmployee = () => {
                 ])
                 .then((data) => {
                     db.query(`UPDATE employees SET role_id = ${data.role} WHERE id = ${data.employee}`, (err, result) => {
+                        if (err) console.log(err);
                         console.log(result);
                         init();
                     });
                 }) // End of inquirer.prompt
         }); // End of role query
     }); // End of employee query
-}
-
-const init = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'list',
-                message: 'What would you like to do?',
-                name: 'action',
-                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Quit']
-            }
-        ])
-        .then((data) => {
-            switch (data.action) {
-                case 'View all departments':
-                    // Present formatted table showing department names and department ids
-                    viewDepartments();
-                    break;
-                case 'View all roles':
-                    // Present table with job titles, role ids, departments that the roles belong to, and salary for that role.
-                    viewRoles();
-                    break;
-                case 'View all employees':
-                    // Present table with employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to.
-                    viewEmployees();
-                    break;
-                case 'Add a department':
-                    // Prompt to enter the name of a department and add to the database
-                    addDepartment();
-                    break;
-                case 'Add a role':
-                    // Prompt to enter the name, salary, and department for the role and add to the database.
-                    addRole();
-                    break;
-                case 'Add an employee':
-                    // Prompt to enter the employees first name, last name, role, and manager and add to the database.
-                    addEmployee();
-                    break;
-                case 'Update an employee role':
-                    // Prompt to select an employee to update and their new role and update in the database.
-                    updateEmployee();
-                    break;
-                default:
-                    console.log('Exiting application');
-                    process.exit(0);
-
-            }
-        });
 };
 
-init();
+const deleteRole = () => {
+    db.query('SELECT id, title FROM roles', (req, res) => {
+        const empList = res.map((item, i) => ({
+            name: `${item.title}`,
+            value: item.id
+        }));
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: "Which role would you like to remove?",
+                    name: 'role',
+                    choices: roleList
+                }
+            ])
+            .then((data) => {
+                db.query(`DELETE FROM employees WHERE id = ${data.role}`, (err, result) => {
+                    if (err) console.log(err);
+                    console.log(`Role was removed`);
+                    init();
+                })
+            })
+    });
+};
+
+const deleteEmployee = () => {
+    db.query('SELECT id, first_name, last_name FROM employees', (req, empRes) => {
+        const empList = empRes.map((item, i) => ({
+            name: `${item.first_name} ${item.last_name}`,
+            value: item.id
+        }));
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: "Which employee would you like to remove?",
+                    name: 'employee',
+                    choices: empList
+                }
+            ])
+            .then((data) => {
+                db.query(`DELETE FROM employees WHERE id = ${data.employee}`, (err, result) => {
+                    if (err) console.log(err);
+                    console.log(`Employee was removed`);
+                    init();
+                })
+            })
+    });
+};
+
+
+
+const init = () => {
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'What would you like to do?',
+                    name: 'action',
+                    choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Remove a role', 'Remove an employee', 'Quit']
+                }
+            ])
+            .then((data) => {
+                switch (data.action) {
+                    case 'View all departments':
+                        // Present formatted table showing department names and department ids
+                        viewDepartments();
+                        break;
+                    case 'View all roles':
+                        // Present table with job titles, role ids, departments that the roles belong to, and salary for that role.
+                        viewRoles();
+                        break;
+                    case 'View all employees':
+                        // Present table with employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to.
+                        viewEmployees();
+                        break;
+                    case 'Add a department':
+                        // Prompt to enter the name of a department and add to the database
+                        addDepartment();
+                        break;
+                    case 'Add a role':
+                        // Prompt to enter the name, salary, and department for the role and add to the database.
+                        addRole();
+                        break;
+                    case 'Add an employee':
+                        // Prompt to enter the employees first name, last name, role, and manager and add to the database.
+                        addEmployee();
+                        break;
+                    case 'Update an employee role':
+                        // Prompt to select an employee to update and their new role and update in the database.
+                        updateEmployeeRole();
+                        break;
+                    case 'Remove a role':
+                        // Prompt to select a role to delete
+                        deleteRole();
+                        break;
+                    case 'Remove an employee':
+                        // Prompt to select an employee to delete from the database
+                        deleteEmployee();
+                        break;
+                    default:
+                        // Exit the application with the 'Quit' Option
+                        console.log('Exiting application');
+                        process.exit(0);
+                }
+            });
+    };
+
+    init();
