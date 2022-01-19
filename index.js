@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const cTable = require('console.table');
 
 // Connect to database
 const db = mysql.createConnection(
@@ -86,6 +87,9 @@ const addRole = () => {
 };
 
 const addEmployee = () => {
+    // db.query('SELECT title, manager FROM employees JOIN roles ON employees.role_id = roles.id', (req, res) => {
+
+    // })
     inquirer
         .prompt([
             {
@@ -118,7 +122,7 @@ const addEmployee = () => {
                         (${data.lastName}),
                         (${data.role}),
                         (${data.manager});`, (err, data) => {
-                console.table(data);    
+                console.log(data);    
                 });
         })
 };
