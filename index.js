@@ -71,7 +71,6 @@ const addDepartment = () => {
 };
 
 const addRole = () => {
-
     db.query('SELECT * FROM departments', (req, res) => {
         const departList = res.map((item, i) => ({
             name: item.department,
@@ -167,24 +166,39 @@ const addEmployee = () => {
 };
 
 const updateEmployee = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'list',
-                message: "Which employee's role would you like to update?",
-                name: 'employee',
-                choices: []
-            },
-            {
-                type: 'list',
-                message: "Which role do you want to assign the selected employee?",
-                name: 'role',
-                choices: []
-            }
-        ])
-        .then((data) => {
-            db.query('UPDATE employees SET title = ? WHERE first_name = ?', data.role, data.employee)
-        })
+    db.query('SELECT id, first_name, last_name FROM employees', (req, empRes) => {
+        const empList = empRes.map((item, i) => ({
+            name: `${item.first_name} ${item.last_name}`,
+            value: item.id
+        }));
+        db.query('SELECT title, id FROM roles', (req, res) => {
+            const roleList = res.map((item, i) => ({
+                name: item.title,
+                value: item.id
+            }));
+            inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        message: "Which employee's role would you like to update?",
+                        name: 'employee',
+                        choices: empList
+                    },
+                    {
+                        type: 'list',
+                        message: "Which role do you want to assign the selected employee?",
+                        name: 'role',
+                        choices: roleList
+                    }
+                ])
+                .then((data) => {
+                    db.query(`UPDATE employees SET role_id = ${data.role} WHERE id = ${data.employee}`, (err, result) => {
+                        console.log(result);
+                        init();
+                    });
+                }) // End of inquirer.prompt
+        }); // End of role query
+    }); // End of employee query
 }
 
 const init = () => {
