@@ -53,65 +53,28 @@ const viewEmployees = () => {
 };
 
 const viewEmployeesByManager = () => {
-    db.query('SELECT id, first_name, last_name FROM employees', (req, empRes) => {
-        const empList = empRes.map((item, i) => ({
-            name: `${item.first_name} ${item.last_name}`,
-            value: item.id
-        }));
-        empList.push({ name: 'None', value: null });
-        inquirer
-            .prompt([
-                {
-                    type: 'list',
-                    message: "What manager's employees would you like to view?",
-                    name: 'manager',
-                    choices: empList,
-                }
-            ])
-            .then((data) => {
-                db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager' FROM employees
+    db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager' FROM employees
                     LEFT JOIN employees emp ON emp.id = employees.manager_id
                     JOIN roles ON employees.role_id = roles.id
-                    JOIN departments ON roles.department_id = departments.id 
-                    WHERE employees.manager_id = '${data.manager}'  
-                    ORDER BY id ASC;`, (err, result) => {
-                        if (err) console.log(err);
-                        console.table(result);
-                        //ask question again 
-                        init();
-                });
-            })
+                    JOIN departments ON roles.department_id = departments.id  
+                    ORDER BY employees.manager_id ASC;`, (err, result) => {
+        if (err) console.log(err);
+        console.table(result);
+        //ask question again 
+        init();
     });
 };
 
 const viewEmployeesByDepartment = () => {
-    db.query('SELECT * FROM departments', (req, res) => {
-        const departList = res.map((item, i) => ({
-            name: item.department,
-            value: item.id
-        }));
-        inquirer
-            .prompt([
-                {
-                    type: 'list',
-                    message: 'What department would you like to view?',
-                    name: 'department',
-                    choices: departList,
-                }
-            ])
-            .then((data) => {
-                db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager ' FROM employees
+    db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager ' FROM employees
                     LEFT JOIN employees emp ON emp.id = employees.manager_id
                     JOIN roles ON employees.role_id = roles.id
-                    JOIN departments ON roles.department_id = departments.id 
-                    WHERE roles.department_id = '${data.department}'  
-                    ORDER BY id ASC;`, (err, result) => {
-                        if (err) console.log(err);
-                        console.table(result);
-                        //ask question again 
-                        init();
-                });
-            })
+                    JOIN departments ON roles.department_id = departments.id   
+                    ORDER BY roles.department_id ASC;`, (err, result) => {
+        if (err) console.log(err);
+        console.table(result);
+        //ask question again 
+        init();
     });
 };
 
@@ -413,11 +376,11 @@ const init = () => {
                     viewEmployees();
                     break;
                 case 'View employees by manager':
-                    // Present table with employee information for a single manager
+                    // Present table with employee information organized by manager
                     viewEmployeesByManager();
                     break;
                 case 'View employees by department':
-                    // Present table with employee information for a single department
+                    // Present table with employee information organized by department
                     viewEmployeesByDepartment();
                     break;
                 case 'Add a department':
