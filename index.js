@@ -36,7 +36,7 @@ const viewRoles = () => {
 };
 
 const viewEmployees = () => {
-    db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, emp.first_name as 'Manager ' FROM employees
+    db.query(`SELECT employees.id, employees.first_name, employees.last_name, title, departments.department, salary, CONCAT(emp.first_name,' ',emp.last_name) as 'Manager ' FROM employees
     LEFT JOIN employees emp ON emp.id = employees.manager_id
     JOIN roles ON employees.role_id = roles.id
     JOIN departments ON roles.department_id = departments.id   
@@ -45,7 +45,6 @@ const viewEmployees = () => {
         //ask question again 
         init();
     });
-
 };
 
 const addDepartment = () => {
@@ -103,15 +102,12 @@ const addRole = () => {
                         ${data.department_id});`, (err, res) => {
 
                     if (err) console.log(err);
-
                     console.table(res);
                     //ask question again 
                     init();
                 });
             });
     })
-
-
 };
 
 const addEmployee = () => {
