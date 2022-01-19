@@ -350,6 +350,36 @@ const deleteEmployee = () => {
     });
 };
 
+// Function to veiew the total utilized budget of a department
+const viewDepartmentBudget = () => {
+    db.query('SELECT id, department FROM departments', (req, res) => {
+        const departList = res.map((item, i) => ({
+            name: `${item.department}`,
+            value: `${item.department}`
+        }));
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'Which department budget do you want to view?',
+                    name: 'department',
+                    choices: departList
+                }
+            ])
+            .then((data) => {
+                db.query(`SELECT departments.department AS Department, SUM(roles.salary) AS 'Utilized Budget'
+                FROM employees 
+                JOIN roles ON employees.role_id = roles.id
+                JOIN departments ON roles.department_id = departments.id
+                WHERE departments.department = '${data.department}'`, (err, result) => {
+                    if (err) console.log(err);
+                    console.table(result);
+                    init();
+                })
+            })
+    });
+};
+
 // Function to initiate the application
 const init = () => {
     inquirer
@@ -358,7 +388,7 @@ const init = () => {
                 type: 'list',
                 message: 'What would you like to do?',
                 name: 'action',
-                choices: ['View all departments', 'View all roles', 'View all employees', 'View employees by manager', 'View employees by department', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update an employee manager', 'Remove a department', 'Remove a role', 'Remove an employee', 'Quit']
+                choices: ['View all departments', 'View all roles', 'View all employees', 'View employees by manager', 'View employees by department', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update an employee manager', 'Remove a department', 'Remove a role', 'Remove an employee', 'View utilized department budget', 'Quit']
             }
         ])
         .then((data) => {
@@ -414,6 +444,10 @@ const init = () => {
                 case 'Remove an employee':
                     // Prompt to select an employee to delete from the database
                     deleteEmployee();
+                    break;
+                case 'View utilized department budget':
+                    // Prompt to select a department to view its utilized budget
+                    viewDepartmentBudget();
                     break;
                 default:
                     // Exit the application with the 'Quit' Option
