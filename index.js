@@ -18,7 +18,7 @@ const db = mysql.createConnection(
 
 // Function to view all departments
 const viewDepartments = () => {
-    db.query(`SELECT * FROM employees_db.departments`, (err, result) => {
+    db.query(`SELECT * FROM departments`, (err, result) => {
         if (err) console.log(err);
         console.table(result);
         //ask question again 
@@ -317,6 +317,7 @@ const deleteDepartment = () => {
             name: `${item.department}`,
             value: item.id
         }));
+        departList.push({name: 'Go Back', value: null});
         inquirer
             .prompt([
                 {
@@ -327,12 +328,13 @@ const deleteDepartment = () => {
                 }
             ])
             .then((data) => {
-                db.query(`DELETE FROM departments WHERE id = ${data.department}`, (err, result) => {
+                if (data.department === null) init();
+                else {db.query(`DELETE FROM departments WHERE id = ${data.department}`, (err, result) => {
                     if (err) console.log(err);
                     console.log(`Department was removed`);
                     init();
-                })
-            })
+                })};
+            });
     });
 };
 
@@ -343,6 +345,7 @@ const deleteRole = () => {
             name: `${item.title}`,
             value: item.id
         }));
+        roleList.push({name: 'Go Back', value: null});
         inquirer
             .prompt([
                 {
@@ -353,12 +356,13 @@ const deleteRole = () => {
                 }
             ])
             .then((data) => {
-                db.query(`DELETE FROM roles WHERE id = ${data.role}`, (err, result) => {
+                if (data.role === null) init();
+                else {db.query(`DELETE FROM roles WHERE id = ${data.role}`, (err, result) => {
                     if (err) console.log(err);
                     console.log(`Role was removed`);
                     init();
-                })
-            })
+                })};
+            });
     });
 };
 
@@ -369,6 +373,7 @@ const deleteEmployee = () => {
             name: `${item.first_name} ${item.last_name}`,
             value: item.id
         }));
+        empList.push({name: 'Go Back', value: null});
         inquirer
             .prompt([
                 {
@@ -379,12 +384,13 @@ const deleteEmployee = () => {
                 }
             ])
             .then((data) => {
-                db.query(`DELETE FROM employees WHERE id = ${data.employee}`, (err, result) => {
+                if (data.employee === null) init();
+                else {db.query(`DELETE FROM employees WHERE id = ${data.employee}`, (err, result) => {
                     if (err) console.log(err);
                     console.log(`Employee was removed`);
                     init();
-                })
-            })
+                })};
+            });
     });
 };
 
