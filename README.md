@@ -43,7 +43,11 @@ This application takes the employee database given and can create, read, update,
 <a name="installation"></a>
 ## Installation
 
-Users can clone this application from the github and run on node.js.
+Users can clone this application from the github and run on node.js. Install proper dependencies by running the commands:
+```
+npm init
+npm i inquirer mysql2 console.table
+```
 
 <a name="usage"></a>
 ## Usage
