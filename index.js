@@ -444,11 +444,11 @@ const init = () => {
                     viewEmployees();
                     break;
                 case 'View employees by manager':
-                    // Present table with employee information organized by manager
+                    // Present table with employee information for those with a specific manager
                     viewEmployeesByManager();
                     break;
                 case 'View employees by department':
-                    // Present table with employee information organized by department
+                    // Present table with employee information for a specific department
                     viewEmployeesByDepartment();
                     break;
                 case 'Add a department':
